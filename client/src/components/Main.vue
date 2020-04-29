@@ -3,11 +3,17 @@
     <h1>Enter screen names:</h1>
 
     <div class="Search">
-      <input class="InputBox" v-model="message" placeholder="" >
-      <img  class=AddButton src="../assets/addB.png" height="36px" width="36px" v-on:click="counter += 1">
+      <input class="InputBox" v-model="screen_name" placeholder="" >
+      <img  class=AddButton src="../assets/addB.png" height="36px" width="36px" v-on:click="addUserName(screen_name)">
     </div>
 
     <br>
+
+    <div>
+      <tr v-for="(sn,  index) in screen_names" :key="index">
+      <td>{{sn}}</td>
+      </tr>
+    </div>
 
     <button class="SearchButton" v-on:click="counter += 1">Search</button>
 
@@ -15,10 +21,44 @@
 </template>
 
 <script>
+  import axios from 'axios';
+
 export default {
   name: 'Main',
-  props: {
-    msg: String
+  data() {
+    return {
+      screen_name: '',
+      screen_names: [],
+      isProtected: false,
+    }
+  },
+  methods: {
+    getUserNames() {
+      const path = 'http://localhost:5000/usernamesLink';
+      axios.get(path)
+              .then((res) => {
+                this.screen_names = res.data.screenNames;
+                console.log(this.screen_names);
+              })
+              .catch((error) => {
+                // eslint-disable-next-line
+                console.error(error);
+              });
+    },
+    addUserName(sn) {
+      const path = 'http://localhost:5000/usernamesLink';
+      const sn_obj = {sn};
+       axios.post(path, sn_obj)
+              .then(() => {
+                this.getUserNames();
+              })
+              .catch((error) => {
+                // eslint-disable-next-line
+                console.error(error);
+                this.getUserNames();
+              });
+
+    }
   }
 }
 </script>

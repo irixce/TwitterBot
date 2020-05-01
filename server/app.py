@@ -8,13 +8,16 @@ app = Flask(__name__)
 app.config.from_object(__name__)
 CORS(app, resources={r'/*': {'origins': '*'}})
 
-screen_names = ["samp1", "samp2"]
+screen_names = ["samp1"]
 
 @app.route('/usernamesLink', methods=['GET', 'POST'])
 def usernames():
     if request.method == 'POST':
-        screen_name = request.get_json()["sn"]
-        screen_names.append(screen_name)
+        if (request.get_json()["exitCue"]):
+            screen_names.clear()
+        else:
+            screen_name = request.get_json()["sn"]
+            screen_names.append(screen_name)
     else:
         return jsonify({
         'status': 'success',

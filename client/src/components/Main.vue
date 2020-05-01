@@ -2,26 +2,31 @@
   <div>
     <h1>Enter screen names:</h1>
 
+    <img class=RefreshButton src="../assets/refresh.png" height="60px" width="60px" v-on:click="Refresh">
+
     <div class="Search">
       <input class="InputBox" v-model="screen_name" placeholder="" >
       <img  class=AddButton src="../assets/addB.png" height="36px" width="36px" v-on:click="addUserName(screen_name)">
     </div>
 
     <br>
+    <span v-for="(sn,  index) in screen_names" :key="index">
+       <ScreenName v-bind:sn="sn"></ScreenName>
+    </span>
+    <br>
+    <br>
 
-    <div>
-      <tr v-for="(sn,  index) in screen_names" :key="index">
-      <td>{{sn}}</td>
-      </tr>
-    </div>
-
-    <button class="SearchButton" v-on:click="counter += 1">Search</button>
+    <span v-show="isValid">
+         <button class="SearchButton" v-on:click="Refresh">Search</button>
+    </span>
 
   </div>
 </template>
 
 <script>
   import axios from 'axios';
+  import ScreenName from "./ScreenName";
+
 
 export default {
   name: 'Main',
@@ -29,6 +34,7 @@ export default {
     return {
       screen_name: '',
       screen_names: [],
+      isValid: false,
       isProtected: false,
     }
   },
@@ -38,6 +44,7 @@ export default {
       axios.get(path)
               .then((res) => {
                 this.screen_names = res.data.screenNames;
+                this.checkValid(this.screen_names);
                 console.log(this.screen_names);
               })
               .catch((error) => {
@@ -47,10 +54,11 @@ export default {
     },
     addUserName(sn) {
       const path = 'http://localhost:5000/usernamesLink';
-      const sn_obj = {sn};
+      const sn_obj = {"exitCue": false, sn};
        axios.post(path, sn_obj)
               .then(() => {
                 this.getUserNames();
+
               })
               .catch((error) => {
                 // eslint-disable-next-line
@@ -58,7 +66,32 @@ export default {
                 this.getUserNames();
               });
 
-    }
+    },
+    Refresh() {
+      const path = 'http://localhost:5000/usernamesLink';
+      const sn_obj = {"exitCue": true};
+       axios.post(path, sn_obj)
+              .then(() => {
+              console.log("cleared")
+                this.getUserNames()
+              })
+              .catch((error) => {
+                // eslint-disable-next-line
+                console.error(error);
+                this.getUserNames();
+              });
+
+    },
+    checkValid(screenNames) {
+      if (screenNames.length >= 2) {
+        this.isValid  = true;
+      } else {
+        this.isValid = false;
+      }
+    },
+  },
+  components: {
+    ScreenName
   }
 }
 </script>
@@ -100,8 +133,23 @@ export default {
     cursor:pointer;
   }
 
+  .RefreshButton:hover{
+    cursor:pointer;
+  }
+
+
   .AddButton:hover{
     cursor:pointer;
+  }
+
+  .ScreenNameListing {
+    border-radius: 10px;
+    background: blue;
+    font-size: 25px;
+    color: white;
+    padding-right: 20px;
+    padding-left: 20px;
+    font-family: Arial;
   }
 
 

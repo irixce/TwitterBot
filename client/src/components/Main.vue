@@ -93,6 +93,7 @@
         axios.get(path)
               .then((res) => {
                 this.isProtected = res.data.db[this.screen_name.toString()]['protected'];
+                //alert box to check if data is being passed correctly
                 alert(this.screen_name.toString() + "is protected?: " + this.isProtected.toString());
               })
               .catch((error) => {

@@ -36,8 +36,7 @@ def db():
     if request.method == 'POST':
         res = list(request.get_json())
         db_list.append(list(request.get_json()))
-        print("POSTTTTTTTTT")
-        print(res[0]['screen_name'])
+        #creating custom dict
         db_dict[res[0]['screen_name'].lower()] = {'protected': res[0]['protected'], 'description': res[0]['description']}
         print(db_dict)
         #print(list(request.get_json()))

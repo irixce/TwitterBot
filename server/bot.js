@@ -15,6 +15,7 @@ const sn_path = 'http://localhost:5000/usernamesLink';
 axios.get(sn_path)
     .then((res) => {
         var user = res.data.screenNames.slice(-1)[0];
+        //user last added is checked ^
         client.get("users/lookup",
                 {screen_name: user })
                 .then(results => {

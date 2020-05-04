@@ -13,8 +13,11 @@ screen_names = ["samp1"]
 @app.route('/usernamesLink', methods=['GET', 'POST'])
 def usernames():
     if request.method == 'POST':
-        if (request.get_json()["exitCue"]):
+        if (request.get_json()["exitCue"] == True):
             screen_names.clear()
+        elif (request.get_json()["exitCue"] == "snDel"):
+            sn_to_delete = request.get_json()["deleteSn"]
+            screen_names.remove(sn_to_delete)
         else:
             screen_name = request.get_json()["sn"]
             screen_names.append(screen_name)

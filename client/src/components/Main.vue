@@ -10,8 +10,9 @@
     </div>
 
     <br>
+
     <span v-for="(sn,  index) in screen_names" :key="index">
-       <ScreenName v-bind:sn="sn"></ScreenName>
+        <ScreenName v-bind:sn="sn" v-on:click="deleteSN"></ScreenName>
     </span>
     <br>
     <br>
@@ -26,6 +27,7 @@
 <script>
   import axios from 'axios';
   import ScreenName from "./ScreenName";
+  import { EventBus } from '../event-bus.js';
 
 
 export default {
@@ -72,7 +74,6 @@ export default {
       const sn_obj = {"exitCue": true};
        axios.post(path, sn_obj)
               .then(() => {
-              console.log("cleared")
                 this.getUserNames()
               })
               .catch((error) => {
@@ -92,7 +93,23 @@ export default {
   },
   components: {
     ScreenName
+  },
+  created() {
+    EventBus.$on('sn-got-clicked', sn  => {
+        const path = 'http://localhost:5000/usernamesLink';
+        const sn_obj = {"exitCue": "snDel", "deleteSn": sn};
+        axios.post(path, sn_obj)
+              .then(() => {
+                this.getUserNames();
+              })
+              .catch((error) => {
+                // eslint-disable-next-line
+                console.error(error);
+                this.getUserNames()
+              });
+  });
   }
+
 }
 </script>
 

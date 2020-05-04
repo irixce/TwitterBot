@@ -12,7 +12,7 @@
     <br>
 
     <span v-for="(sn,  index) in screen_names" :key="index">
-        <ScreenName v-bind:sn="sn" v-on:click="deleteSN"></ScreenName>
+        <ScreenName v-bind:sn="sn"></ScreenName>
     </span>
     <br>
     <br>

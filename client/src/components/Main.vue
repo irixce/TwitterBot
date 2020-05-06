@@ -19,6 +19,7 @@
 
     <span v-show="isValid">
          <button class="SearchButton" v-on:click="Refresh">Search</button>
+         <button class="checkPro" v-on:click="checkProtected()">TEST</button>
     </span>
 
   </div>
@@ -30,14 +31,14 @@
   import { EventBus } from '../event-bus.js';
 
 
-export default {
+  export default {
   name: 'Main',
   data() {
     return {
       screen_name: '',
       screen_names: [],
       isValid: false,
-      isProtected: false,
+      isProtected: true,
     }
   },
   methods: {
@@ -83,6 +84,23 @@ export default {
               });
 
     },
+    checkProtected() {
+
+      alert("SN from main got clicked");
+
+      const path = 'http://localhost:5000/database';
+
+        axios.get(path)
+              .then((res) => {
+                this.isProtected = res.data.db[this.screen_name.toString()]['protected'];
+                //alert box to check if data is being passed correctly
+                alert(this.screen_name.toString() + "is protected?: " + this.isProtected.toString());
+              })
+              .catch((error) => {
+                // eslint-disable-next-line
+                console.error(error);
+              });
+    },
     checkValid(screenNames) {
       if (screenNames.length >= 2) {
         this.isValid  = true;
@@ -98,6 +116,7 @@ export default {
     EventBus.$on('sn-got-clicked', sn  => {
         const path = 'http://localhost:5000/usernamesLink';
         const sn_obj = {"exitCue": "snDel", "deleteSn": sn};
+
         axios.post(path, sn_obj)
               .then(() => {
                 this.getUserNames();
@@ -108,6 +127,7 @@ export default {
                 this.getUserNames()
               });
   });
+
   }
 
 }

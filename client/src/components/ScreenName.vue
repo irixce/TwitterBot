@@ -20,6 +20,7 @@ export default {
   methods: {
         mouseIn: function(){
             this.active = !this.active;
+
         },
         emitDeleteToMain: function() {
           EventBus.$emit('sn-got-clicked', this.sn);
@@ -38,8 +39,10 @@ h3 {
      background: lightskyblue;
      color: darkblue;
      font: bold;
-    font-size: 25px;
-     border-radius: 5px;
+     font-family: Futura;
+     font-size: 25px;
+      box-shadow: 0px 4px gray;
+    border-radius: 5px;
      padding-left: 4px;
      padding-right: 4px;
     display: inline-block; /* change the display type           */

@@ -2,7 +2,6 @@ from flask import Flask, jsonify, request
 from flask_cors import CORS
 from subprocess import call
 
-print("here")
 DEBUG = True
 
 app = Flask(__name__)
@@ -10,9 +9,11 @@ app.config.from_object(__name__)
 
 CORS(app, resources={r'/*': {'origins': '*'}})
 
-screen_names = ["samp1"]
+screen_names = []
 db_list = []
 db_dict = {}
+common_followers_list = []
+followers_dict = {}
 
 @app.route('/usernamesLink', methods=['GET', 'POST'])
 def usernames():
@@ -48,6 +49,32 @@ def db():
         'db': db_dict
 
     })
+
+@app.route('/followers', methods=['GET', 'POST'])
+def followersFunc():
+    if request.method == 'POST':
+        print([request.get_json()["follower_screen_name"]])
+        if screen_names[-1] in followers_dict.keys():
+            followers_dict[screen_names[-1]].extend([request.get_json()["follower_screen_name"]])
+            print(followers_dict)
+        else:
+            followers_dict[screen_names[-1]] = []
+    else:
+        common_followers_list = calculate_common_followers()
+        return jsonify({
+        'status': 'success',
+        'common_followers_list': common_followers_list,
+        'followers': followers_dict
+
+    })
+
+def calculate_common_followers():
+    set_list = []
+    for k in followers_dict.keys():
+        print(followers_dict[k])
+        set_list.append(set(followers_dict[k]))
+    print(set_list)
+    return list(set.intersection(*set_list))
 
 if __name__ == '__main__':
     app.run()

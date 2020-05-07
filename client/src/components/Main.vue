@@ -18,10 +18,17 @@
     <br>
 
     <span v-show="isValid">
-         <button class="SearchButton" v-on:click="Refresh">Search</button>
-         <button class="checkPro" v-on:click="checkProtected()">TEST</button>
+         <button class="SearchButton" v-on:click="Search">Search</button>
+    </span>
+    <br>
+    <br>
+    <span v-for="(follower,  index) in common_followers" :key="index">
+      <p class="Follower"> {{follower}} </p>
     </span>
 
+    <span v-show="noCommonFollowers">
+         <p> Sorry, no common followers for these users. </p>
+    </span>
   </div>
 </template>
 
@@ -39,6 +46,8 @@
       screen_names: [],
       isValid: false,
       isProtected: true,
+      common_followers: [],
+      noCommonFollowers: false,
     }
   },
   methods: {
@@ -55,18 +64,34 @@
                 console.error(error);
               });
     },
+    Search() {
+      const path = 'http://localhost:5000/followers';
+      axios.get(path)
+              .then((res) => {
+                this.common_followers = res.data.common_followers_list;
+                if (this.common_followers.length  == 0) {
+                  this.noCommonFollowers = true;
+                }
+              })
+              .catch((error) => {
+                // eslint-disable-next-line
+                console.error(error);
+              });
+    },
     addUserName(sn) {
       const path = 'http://localhost:5000/usernamesLink';
       const sn_obj = {"exitCue": false, sn};
        axios.post(path, sn_obj)
               .then(() => {
-                this.getUserNames();
+                this.checkProtected();
+                //this.getUserNames();
 
               })
               .catch((error) => {
                 // eslint-disable-next-line
                 console.error(error);
-                this.getUserNames();
+                this.checkProtected();
+                //this.getUserNames();
               });
 
     },
@@ -75,7 +100,7 @@
       const sn_obj = {"exitCue": true};
        axios.post(path, sn_obj)
               .then(() => {
-                this.getUserNames()
+                this.getUserNames();
               })
               .catch((error) => {
                 // eslint-disable-next-line
@@ -94,7 +119,15 @@
               .then((res) => {
                 this.isProtected = res.data.db[this.screen_name.toString()]['protected'];
                 //alert box to check if data is being passed correctly
-                alert(this.screen_name.toString() + "is protected?: " + this.isProtected.toString());
+
+                if (this.isProtected) {
+                  alert("Cannot run search on" + this.screen_name.toString() +
+                          ". It is a protected account. Please add a valid screen name." );
+                  EventBus.$emit('delete-sn', this.screen_name);
+                } else {
+                  this.getUserNames();
+                }
+
               })
               .catch((error) => {
                 // eslint-disable-next-line
@@ -113,7 +146,7 @@
     ScreenName
   },
   created() {
-    EventBus.$on('sn-got-clicked', sn  => {
+    EventBus.$on('delete-sn', sn  => {
         const path = 'http://localhost:5000/usernamesLink';
         const sn_obj = {"exitCue": "snDel", "deleteSn": sn};
 
@@ -187,6 +220,21 @@
     padding-right: 20px;
     padding-left: 20px;
     font-family: Arial;
+  }
+
+  .Follower {
+    padding: 4px;
+    background: purple;
+    border-radius: 5px;
+    border-radius: 10px;
+    font-family: "Courier New";
+    color:white;
+    margin-left: auto;
+    margin-right: auto;
+    align-content: center;
+    display: block;
+    font-size: 35px;
+    width: 260px;
   }
 
 

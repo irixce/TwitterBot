@@ -23,7 +23,7 @@ export default {
 
         },
         emitDeleteToMain: function() {
-          EventBus.$emit('sn-got-clicked', this.sn);
+          EventBus.$emit('delete-sn', this.sn);
         },
     }
 }
